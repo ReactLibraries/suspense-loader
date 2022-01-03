@@ -2,8 +2,12 @@
 
 ## Overview
 
-This library handles SSR/SSR-Streaming/CSR in Next.js
+This library handles SSR/SSR-Streaming/CSR in Next.js  
 RSC is not used for SSR-Streaming
+
+## Sample
+
+<https://next-streaming.vercel.app/>
 
 ## Usage
 
@@ -105,7 +109,7 @@ App.getInitialProps = async ({ Component, router, AppTree }: AppContext) => {
 export default App;
 ```
 
-## Sample
+## Example
 
 <https://github.com/SoraKumo001/next-streaming>
 
