@@ -102,7 +102,8 @@ const App = (props: AppProps & { context: SuspenseTreeContextType }) => {
 
 App.getInitialProps = async ({ Component, router, AppTree }: AppContext) => {
   const context = await getDataFromTree(
-    <AppTree Component={Component} pageProps={{}} router={router} />
+    <AppTree Component={Component} pageProps={{}} router={router} />,
+    1400 // fetch-timeout(Set to within 1500ms when using Vercel.)
   );
   return { context };
 };

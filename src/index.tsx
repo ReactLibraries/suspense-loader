@@ -199,7 +199,8 @@ export const setSuspenseTreeContext = (context?: SuspenseTreeContextType) => {
 const TreeContext = createContext<SuspenseTreeContextType>(undefined as never);
 const useTreeContext = () => useContext(TreeContext) || globalTreeContext;
 export const getDataFromTree = async (
-  element: ReactElement
+  element: ReactElement,
+  timeout?: number
 ): Promise<SuspenseTreeContextType | undefined> => {
   if (!isServer) return Promise.resolve(undefined);
   const promiseMap: PromiseMap = {};
@@ -216,12 +217,20 @@ export const getDataFromTree = async (
     ).read();
   }
   let length = Object.keys(promiseMap).length;
+  const promiseTimeout = new Promise((resolve) => timeout && setTimeout(resolve, timeout));
   for (;;) {
-    await Promise.all(
-      Object.values(promiseMap)
-        .filter((v) => !isStreaming || !v.streaming)
-        .map((v) => v.promise)
-    );
+    const result = await Promise.race([
+      Promise.all(
+        Object.values(promiseMap)
+          .filter((v) => !isStreaming || !v.streaming)
+          .map((v) => v.promise)
+      ),
+      promiseTimeout,
+    ]);
+    if (!result) {
+      break;
+    }
+
     const newlength = Object.keys(promiseMap).length;
     if (newlength === length) break;
     length = newlength;

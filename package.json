@@ -1,6 +1,6 @@
 {
   "name": "@react-libraries/suspense-loader",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
@@ -33,5 +33,13 @@
   ],
   "author": "SoraKumo",
   "license": "MIT",
-  "description": "A library for implementing sst-streaming in Next.js"
+  "description": "A library for implementing sst-streaming in Next.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReactLibraries/suspense-loader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ReactLibraries/suspense-loader/issues"
+  },
+  "homepage": "https://github.com/ReactLibraries/suspense-loader#readme"
 }
