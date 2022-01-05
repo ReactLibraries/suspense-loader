@@ -13,6 +13,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+
 type SuspensePropeatyType<T, V> = {
   value?: T;
   isInit?: boolean;
@@ -22,7 +23,7 @@ type SuspensePropeatyType<T, V> = {
 type PromiseMap = {
   [key: string]: { streaming: boolean; promise: Promise<unknown> | undefined };
 };
-
+const isReact18 = Number(/(\d+)/.exec(React.version)![0]) >= 18;
 export type SuspenseType = 'streaming' | 'ssr' | 'csr';
 export type SuspenseTreeContextType = {
   promiseMap: {
@@ -58,12 +59,18 @@ const SuspenseWapper = <T, V>({
   streaming?: boolean;
 }) => {
   const { isInit, isSuspenseLoad, value } = property;
-  if (!isInit) throw load();
+  if (!isInit) {
+    if (isReact18 || !isServer) throw load();
+  }
   const [isRequestData, setRequestData] = useState((isSuspenseLoad || isServer) && streaming);
   useEffect(() => setRequestData(false), []);
   const contextValue = useMemo(() => {
     return { value, dispatch };
   }, [value, dispatch]);
+  if (!isInit) {
+    load();
+    return null;
+  }
   return (
     <SuspenseDataContext.Provider value={contextValue}>
       {isRequestData && (
@@ -164,9 +171,26 @@ export const SuspenseLoader = <T, V>({
   useEffect(() => {
     setVisible(true);
   }, [isVisible]);
-  return isCSRFallback ? (
-    <>{fallback}</>
-  ) : (
+  if (isCSRFallback) return <>{fallback}</>;
+  if (isServer && !isReact18) {
+    if (promiseMap[name] && !property.isInit) return <>{fallback}</>;
+    return (
+      <>
+        {isVisible && (
+          <SuspenseWapper<T, V>
+            idName={idName}
+            property={property}
+            dispatch={loadDispatch}
+            load={load}
+            streaming={!cacheSrcMap[name]}
+          >
+            {children}
+          </SuspenseWapper>
+        )}
+      </>
+    );
+  }
+  return (
     <Suspense fallback={fallback || false}>
       {isVisible && (
         <SuspenseWapper<T, V>
@@ -195,7 +219,6 @@ export const setSuspenseTreeContext = (context?: SuspenseTreeContextType) => {
   Object.assign(globalTreeContext.cacheMap, cacheMap);
   cacheSrcMap = { ...cacheMap };
 };
-
 const TreeContext = createContext<SuspenseTreeContextType>(undefined as never);
 const useTreeContext = () => useContext(TreeContext) || globalTreeContext;
 export const getDataFromTree = async (
