@@ -155,7 +155,6 @@ export const SuspenseLoader = <T, V>({
       property.loaderValue = value;
       delete cacheMap[name];
       delete promiseMap[name];
-      setVisible(isServer || false);
       reload({});
     },
     [cacheMap, name, promiseMap, property, reload]
@@ -167,32 +166,11 @@ export const SuspenseLoader = <T, V>({
   useEffect(() => {
     setCSRFallback(false);
   }, []);
-  const [isVisible, setVisible] = useState(true);
-  useEffect(() => {
-    setVisible(true);
-  }, [isVisible]);
   if (isCSRFallback) return <>{fallback}</>;
   if (isServer && !isReact18) {
     if (promiseMap[name] && !property.isInit) return <>{fallback}</>;
     return (
       <>
-        {isVisible && (
-          <SuspenseWapper<T, V>
-            idName={idName}
-            property={property}
-            dispatch={loadDispatch}
-            load={load}
-            streaming={!cacheSrcMap[name]}
-          >
-            {children}
-          </SuspenseWapper>
-        )}
-      </>
-    );
-  }
-  return (
-    <Suspense fallback={fallback || false}>
-      {isVisible && (
         <SuspenseWapper<T, V>
           idName={idName}
           property={property}
@@ -202,7 +180,20 @@ export const SuspenseLoader = <T, V>({
         >
           {children}
         </SuspenseWapper>
-      )}
+      </>
+    );
+  }
+  return (
+    <Suspense fallback={fallback || false}>
+      <SuspenseWapper<T, V>
+        idName={idName}
+        property={property}
+        dispatch={loadDispatch}
+        load={load}
+        streaming={!cacheSrcMap[name]}
+      >
+        {children}
+      </SuspenseWapper>
     </Suspense>
   );
 };
