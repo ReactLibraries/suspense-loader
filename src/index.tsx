@@ -47,14 +47,14 @@ const SuspenseWapper = <T, V>({
   property,
   idName,
   dispatch,
-  children,
+  children: Children,
   load,
   streaming,
 }: {
   property: SuspensePropeatyType<T, V>;
   idName: string;
   dispatch: SuspenseDispatch<V>;
-  children: ReactNode;
+  children: ReactNode | ((value: T & { dispatch: SuspenseDispatch<V> }) => ReactNode);
   load: () => Promise<unknown>;
   streaming?: boolean;
 }) => {
@@ -82,7 +82,7 @@ const SuspenseWapper = <T, V>({
           }}
         />
       )}
-      {children}
+      {typeof Children === 'function' ? <Children {...{ dispatch, ...value! }} /> : Children}
     </SuspenseDataContext.Provider>
   );
 };
@@ -102,10 +102,8 @@ export const SuspenseLoader = <T, V>({
   loaderValue?: V;
   fallback?: SuspenseProps['fallback'];
   onLoaded?: (value: T) => void;
-  children: ReactNode;
+  children: ReactNode | ((value: T & { dispatch: SuspenseDispatch<V> }) => ReactNode);
   dispatch?: MutableRefObject<SuspenseDispatch<V> | undefined>;
-  streaming?: boolean;
-  ssr?: boolean;
   type: SuspenseType;
 }) => {
   const reload = useState({})[1];

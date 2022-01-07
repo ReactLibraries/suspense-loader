@@ -79,6 +79,19 @@ const Component = () => {
 </SuspenseLoader>;
 ```
 
+- When passing data directly
+
+```tsx
+<SuspenseLoader {...props}>
+  {({ dispatch, ...value }) => (
+    <div>
+      <div onClick={() => dispatch()}>Reload</div>
+      <div>{JSON.stringify(value)}</div>
+    </div>
+  )}
+</SuspenseLoader>
+```
+
 - Work to use regular SSRs.
 
 pages/\_app.tsx
@@ -151,6 +164,9 @@ const News = ({ wait, type }: { wait: number; type: SuspenseType }) => {
         onLoaded={() => console.log('Loading complete')} //Events that occur after loading is complete
         type={type}
       >
+        {
+          //To retrieve data, useSuspenseData in the component.
+        }
         <NewsWithData wait={wait} type={type} />
       </SuspenseLoader>
     </>
@@ -166,6 +182,7 @@ import { SuspenseLoader, SuspenseType, useSuspenseData } from '.@react-libraries
 import { Spinner } from './Spinner';
 
 export const NewsWithData = ({ wait, type }: { wait: number; type: SuspenseType }) => {
+  //Data is passed from SuspenseLoader.
   const storyIds = useSuspenseData<number[] | undefined>();
   if (!storyIds) return null;
   return (
