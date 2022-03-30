@@ -83,7 +83,7 @@ const Component = () => {
 
 ```tsx
 <SuspenseLoader {...props}>
-  {({ dispatch, ...value }) => (
+  {(value, dispatch) => (
     <div>
       <div onClick={() => dispatch()}>Reload</div>
       <div>{JSON.stringify(value)}</div>

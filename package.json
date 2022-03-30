@@ -1,6 +1,6 @@
 {
   "name": "@react-libraries/suspense-loader",
-  "version": "0.0.8",
+  "version": "0.0.11",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
@@ -11,18 +11,18 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/node": "^17.0.7",
-    "@types/react": "^17.0.38",
-    "@types/react-dom": "^17.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.8.1",
-    "@typescript-eslint/parser": "^5.8.1",
-    "eslint": "8.6.0",
-    "eslint-config-next": "12.0.7",
-    "eslint-config-prettier": "^8.3.0",
-    "prettier": "^2.5.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "typescript": "^4.5.4"
+    "@types/node": "^17.0.23",
+    "@types/react": "^17.0.43",
+    "@types/react-dom": "^17.0.14",
+    "@typescript-eslint/eslint-plugin": "^5.17.0",
+    "@typescript-eslint/parser": "^5.17.0",
+    "eslint": "8.12.0",
+    "eslint-config-next": "12.1.2",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.6.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "typescript": "^4.6.3"
   },
   "keywords": [
     "react",

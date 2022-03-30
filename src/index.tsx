@@ -47,21 +47,19 @@ const SuspenseWapper = <T, V>({
   property,
   idName,
   dispatch,
-  children: Children,
+  children,
   load,
   streaming,
 }: {
   property: SuspensePropeatyType<T, V>;
   idName: string;
   dispatch: SuspenseDispatch<V>;
-  children: ReactNode | ((value: T & { dispatch: SuspenseDispatch<V> }) => ReactNode);
+  children: ReactNode | ((value: T, dispatch: SuspenseDispatch<V>) => ReactNode);
   load: () => Promise<unknown>;
   streaming?: boolean;
 }) => {
   const { isInit, isSuspenseLoad, value } = property;
-  if (!isInit) {
-    if (isReact18 || !isServer) throw load();
-  }
+  if (!isInit && (isReact18 || !isServer)) throw load();
   const [isRequestData, setRequestData] = useState((isSuspenseLoad || isServer) && streaming);
   useEffect(() => setRequestData(false), []);
   const contextValue = useMemo(() => {
@@ -82,7 +80,7 @@ const SuspenseWapper = <T, V>({
           }}
         />
       )}
-      {typeof Children === 'function' ? <Children {...{ dispatch, ...value! }} /> : Children}
+      {typeof children === 'function' ? children(value as T, dispatch) : children}
     </SuspenseDataContext.Provider>
   );
 };
@@ -102,7 +100,7 @@ export const SuspenseLoader = <T, V>({
   loaderValue?: V;
   fallback?: SuspenseProps['fallback'];
   onLoaded?: (value: T) => void;
-  children: ReactNode | ((value: T & { dispatch: SuspenseDispatch<V> }) => ReactNode);
+  children: ReactNode | ((value: T, dispatch: SuspenseDispatch<V>) => ReactNode);
   dispatch?: MutableRefObject<SuspenseDispatch<V> | undefined>;
   type: SuspenseType;
 }) => {
@@ -217,7 +215,7 @@ export const getDataFromTree = async (
   if (!isServer) return Promise.resolve(undefined);
   const promiseMap: PromiseMap = {};
   const cacheMap: { [key: string]: unknown } = {};
-  const ReactDOMServer = require('react-dom/server');
+  const ReactDOMServer = require('react-dom/server.browser');
   const isStreaming = 'renderToReadableStream' in ReactDOMServer;
   if (isStreaming) {
     ReactDOMServer.renderToReadableStream(
