@@ -25,7 +25,7 @@ yarn add react/rc react-dom/rc
  */
 const config = {
   experimental: {
-    concurrentFeatures: true,
+    runtime: 'edge',
   },
 };
 module.exports = config;
