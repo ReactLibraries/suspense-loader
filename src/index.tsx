@@ -202,8 +202,8 @@ let cacheSrcMap: { [key: string]: unknown } = {};
 export const setSuspenseTreeContext = (context?: SuspenseTreeContextType) => {
   if (!context) return;
   const { promiseMap, cacheMap } = context;
-  Object.assign(globalTreeContext.promiseMap, promiseMap);
-  Object.assign(globalTreeContext.cacheMap, cacheMap);
+  globalTreeContext.promiseMap = promiseMap;
+  globalTreeContext.cacheMap = cacheMap;
   cacheSrcMap = { ...cacheMap };
 };
 const TreeContext = createContext<SuspenseTreeContextType>(undefined as never);
