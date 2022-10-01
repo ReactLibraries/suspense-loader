@@ -5,7 +5,8 @@
 This library handles SSR/SSR-Streaming/CSR in Next.js  
 RSC is not used for SSR-Streaming
 
-Next.js 12.2.x has a bug that prevents streaming from working, so please use the 12.1.6 system.
+We have confirmed that it works with Next.js 12.3.1 or later.
+
 
 ## Sample
 
@@ -27,7 +28,7 @@ yarn add react/rc react-dom/rc
  */
 const config = {
   experimental: {
-    runtime: 'edge',
+    runtime: 'experimental-edge',
   },
 };
 module.exports = config;
