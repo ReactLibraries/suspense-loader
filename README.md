@@ -167,9 +167,7 @@ const News = ({ wait, type }: { wait: number; type: SuspenseType }) => {
         onLoaded={() => console.log('Loading complete')} //Events that occur after loading is complete
         type={type}
       >
-        {
-          //To retrieve data, useSuspenseData in the component.
-        }
+        { /* To retrieve data, useSuspenseData in the component. */ }
         <NewsWithData wait={wait} type={type} />
       </SuspenseLoader>
     </>

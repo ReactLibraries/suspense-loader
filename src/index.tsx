@@ -14,7 +14,10 @@ import React, {
   useState,
 } from 'react';
 
-type SuspensePropeatyType<T, V> = {
+export type SuspenseReturnType<T extends (...args: never) => unknown> =
+  ReturnType<T> extends Promise<infer R> ? R : never
+
+type SuspensePropertyType<T, V> = {
   value?: T;
   isInit?: boolean;
   isSuspenseLoad?: boolean;
@@ -23,7 +26,6 @@ type SuspensePropeatyType<T, V> = {
 type PromiseMap = {
   [key: string]: { streaming: boolean; promise: Promise<unknown> | undefined };
 };
-const isReact18 = Number(/(\d+)/.exec(React.version)![0]) >= 18;
 export type SuspenseType = 'streaming' | 'ssr' | 'csr';
 export type SuspenseTreeContextType = {
   promiseMap: {
@@ -35,6 +37,7 @@ export type SuspenseTreeContextType = {
   cacheMap: { [key: string]: unknown };
 };
 export type SuspenseDispatch<T = unknown> = (value?: T) => void;
+const isReact18 = Number(/(\d+)/.exec(React.version)![0]) >= 18;
 const isServer = typeof window === 'undefined';
 const SuspenseDataContext = createContext<{
   value: unknown;
@@ -43,7 +46,7 @@ const SuspenseDataContext = createContext<{
 export const useSuspenseData = <T,>() => useContext(SuspenseDataContext).value as T;
 export const useSuspenseDispatch = <V,>() =>
   useContext(SuspenseDataContext).dispatch as SuspenseDispatch<V>;
-const SuspenseWapper = <T, V>({
+const SuspenseWrapper = <T, V>({
   property,
   idName,
   dispatch,
@@ -51,7 +54,7 @@ const SuspenseWapper = <T, V>({
   load,
   streaming,
 }: {
-  property: SuspensePropeatyType<T, V>;
+  property: SuspensePropertyType<T, V>;
   idName: string;
   dispatch: SuspenseDispatch<V>;
   children: ReactNode | ((value: T, dispatch: SuspenseDispatch<V>) => ReactNode);
@@ -107,7 +110,7 @@ export const SuspenseLoader = <T, V>({
   const reload = useState({})[1];
   const idName = '#__NEXT_DATA__STREAM__' + name;
   const { promiseMap, cacheMap } = useTreeContext();
-  const property = useRef<SuspensePropeatyType<T, V>>({}).current;
+  const property = useRef<SuspensePropertyType<T, V>>({}).current;
   if (!property.isInit) {
     const value = cacheMap[name] as T | undefined;
     if (value) {
@@ -167,7 +170,7 @@ export const SuspenseLoader = <T, V>({
     if (promiseMap[name] && !property.isInit) return <>{fallback}</>;
     return (
       <>
-        <SuspenseWapper<T, V>
+        <SuspenseWrapper<T, V>
           idName={idName}
           property={property}
           dispatch={loadDispatch}
@@ -175,13 +178,13 @@ export const SuspenseLoader = <T, V>({
           streaming={!cacheSrcMap[name]}
         >
           {children}
-        </SuspenseWapper>
+        </SuspenseWrapper>
       </>
     );
   }
   return (
     <Suspense fallback={fallback || false}>
-      <SuspenseWapper<T, V>
+      <SuspenseWrapper<T, V>
         idName={idName}
         property={property}
         dispatch={loadDispatch}
@@ -189,7 +192,7 @@ export const SuspenseLoader = <T, V>({
         streaming={!cacheSrcMap[name]}
       >
         {children}
-      </SuspenseWapper>
+      </SuspenseWrapper>
     </Suspense>
   );
 };
@@ -228,7 +231,7 @@ export const getDataFromTree = async (
   }
   let length = Object.keys(promiseMap).length;
   const promiseTimeout = new Promise((resolve) => timeout && setTimeout(resolve, timeout));
-  for (;;) {
+  for (; ;) {
     const result = await Promise.race([
       Promise.all(
         Object.values(promiseMap)
@@ -241,9 +244,9 @@ export const getDataFromTree = async (
       break;
     }
 
-    const newlength = Object.keys(promiseMap).length;
-    if (newlength === length) break;
-    length = newlength;
+    const newLength = Object.keys(promiseMap).length;
+    if (newLength === length) break;
+    length = newLength;
   }
   return { cacheMap, promiseMap };
 };
